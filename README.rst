@@ -1,4 +1,13 @@
 ===========
+QEMU-RETRO
+===========
+
+WARNING
+=============
+This project is in very early development (as in, i only just finished setting up the development environment),
+so please be patient while i get this project going.
+
+===========
 QEMU README
 ===========
 
