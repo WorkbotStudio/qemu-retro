@@ -4,8 +4,13 @@ QEMU-RETRO
 
 WARNING
 =============
-This project is in very early development (as in, i only just finished setting up the development environment),
-so please be patient while i get this project going.
+
+This project is in very early development, and the things i wanted to do so far have proven more difficult than i initially anticipated...
+So please be patient while i add actual things of value to this fork.
+
+Please see ROADMAP.rst for future plans
+
+Below is the original QEMU readme
 
 ===========
 QEMU README
