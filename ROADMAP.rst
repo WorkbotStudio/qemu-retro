@@ -3,12 +3,7 @@ ROADMAP
 ===========
 
 This is a list of things that are planned for this fork (in no particular order)
-
-MOUSES
-=============
-
-| Microsoft Bus Mouse (For Windows 1.0)
-| (MORE TO COME)
+Please note that the plans listed here are not 100% guaranteed to happen.
 
 PRINTERS
 =============
@@ -16,23 +11,28 @@ PRINTERS
 | Epson FX 80
 | (MORE TO COME)
 
-GPUs
+GPU EMULATION
 =============
 
-| 3DFX voodoo
-| nVIDIA riva 128
+| 3DFX voodoo series
+| nVIDIA riva 128 series
+| nVIDIA riva TNT series
 | (MORE TO COME)
 
 BUG FIXES
 =============
 
-| gtk mouse capture under wayland
+| gtk mouse capture under wayland not restraining the mouse properly
+| "-serial mouse" not working under Windows 1.0 without copying mouse.drv from Windows 2.0
 | (MORE TO COME)
 
 IMPROVEMENTS
 =============
 
 | Menu bar for sdl backend
+| Automatic terminal opening/hooking for interfacing with the runtime QEMU commandline
+| Gui for launching/managing virtual machines
 | Menu option for swapping disks
+| Automatic VFIO loading for host device passthrough
 | .bin/.cue support in -cdrom
 | (MORE TO COME)

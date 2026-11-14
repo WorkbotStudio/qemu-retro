@@ -86,3 +86,9 @@ config LPC_ICH9
     select ISA_BUS
     select ACPI_ICH9
     select MC146818RTC
+
+# Added by qemu-retro
+config BUS_MOUSE
+    bool
+    default y
+    select ISA_BUS

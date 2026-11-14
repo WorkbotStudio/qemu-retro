@@ -2,11 +2,18 @@
 QEMU-RETRO
 ===========
 
+FEATURES
+=============
+
+| - Microsoft Bus Mouse emulation (ported from 86Box's mouse_bus.c implementation):
+| Available under: "-device bus-mouse"
+| It makes the mouse work under Windows 1.0 without the need to replace mouse.drv
+| NOTE: Only the Microsoft Bus Mouse has been ported, so no InPort Bus Mouse (yet)
+
 WARNING
 =============
 
-This project is in very early development, and the things i wanted to do so far have proven more difficult than i initially anticipated...
-So please be patient while i add actual things of value to this fork.
+This project is in very early development, so please be patient while i add new features to this fork.
 
 Please see ROADMAP.rst for future plans
 

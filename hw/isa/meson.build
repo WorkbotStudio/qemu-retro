@@ -8,5 +8,8 @@ system_ss.add(when: 'CONFIG_PIIX', if_true: files('piix.c'))
 system_ss.add(when: 'CONFIG_SMC37C669', if_true: files('smc37c669-superio.c'))
 system_ss.add(when: 'CONFIG_VT82C686', if_true: files('vt82c686.c'))
 
+# Added by qemu-retro
+system_ss.add(when: 'CONFIG_BUS_MOUSE', if_true: files('mouse_bus.c'))
+
 specific_ss.add(when: 'CONFIG_PC87560', if_true: files('pc87560.c'))
 specific_ss.add(when: 'CONFIG_LPC_ICH9', if_true: files('lpc_ich9.c'))
