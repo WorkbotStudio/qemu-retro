@@ -74,6 +74,7 @@
 #include "ui/input.h"
 #include "hw/core/qdev-properties.h"
 #include "hw/core/qdev-properties-system.h"
+#include "qapi/error.h"
 
 #include "qemu/qemu-print.h"
 
@@ -309,6 +310,30 @@ static const QemuInputHandler busmouse_handler = {
 static void busmouse_realizefn(DeviceState *dev, Error **errp)
 {
     BusMouseState* s = BUS_MOUSE(dev);
+
+    if(s->bn > 3)
+    {
+        error_setg(errp, "Can't support more than three buttons.");
+        return;
+    }
+
+    if(s->bn < 2)
+    {
+        error_setg(errp, "Can't support less than two buttons.");
+        return;
+    }
+
+    if(s->irq < 2 || s->irq > 5)
+    {
+        error_setg(errp, "Irq must be between 2 and 5.");
+        return;
+    }
+
+    if(s->base != 0x230 && s->base != 0x234 && s->base != 0x238 && s->base != 0x23c)
+    {
+        error_setg(errp, "Base address must be either 0x230, 0x234, 0x238 or 0x23c.");
+        return;
+    }
 
     memory_region_init_io(&s->io, OBJECT(s), &busmouse_io_ops, s, "ioports", 4);
     isa_register_ioport(&s->parent_obj, &s->io, s->base);
