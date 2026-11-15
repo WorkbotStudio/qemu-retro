@@ -323,7 +323,7 @@ static void busmouse_realizefn(DeviceState *dev, Error **errp)
         return;
     }
 
-    if(s->irq < 2 || s->irq > 5)
+    if(s->irq_num < 2 || s->irq_num > 5)
     {
         error_setg(errp, "Irq must be between 2 and 5.");
         return;
