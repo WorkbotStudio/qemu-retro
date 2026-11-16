@@ -344,7 +344,7 @@ static void busmouse_realizefn(DeviceState *dev, Error **errp)
     qemu_input_handler_activate(s->hs);
 }
 
-static const Property parallel_isa_properties[] = {
+static const Property bus_mouse_properties[] = {
     DEFINE_PROP_UINT8("buttons", BusMouseState, bn, 2),
     DEFINE_PROP_UINT8("irq",   BusMouseState, irq_num,  5),
     DEFINE_PROP_UINT16("base", BusMouseState, base, 0x23c),
@@ -364,7 +364,7 @@ static void busmouse_class_init(ObjectClass *oc, const void *data)
     DeviceClass *dc = DEVICE_CLASS(oc);
 
     dc->realize = busmouse_realizefn;
-    device_class_set_props(dc, parallel_isa_properties);
+    device_class_set_props(dc, bus_mouse_properties);
     device_class_set_legacy_reset(dc, busmouse_reset);
     set_bit(DEVICE_CATEGORY_INPUT, dc->categories);
 }
