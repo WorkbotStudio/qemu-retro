@@ -2,13 +2,13 @@
 ROADMAP
 ===========
 
-This is a list of things that are planned for this fork (in no particular order)
-Please note that the plans listed here are not 100% guaranteed to happen.
+| This is a list of things that are planned for this fork (in no particular order)
+| Please note that the plans listed here are not 100% guaranteed to happen.
 
-PRINTERS
+PRINTER EMULATION
 =============
 
-| Epson FX 80
+| Epson FX 80 (currently in development)
 | (MORE TO COME)
 
 GPU EMULATION
@@ -35,4 +35,6 @@ IMPROVEMENTS
 | Menu option for swapping disks
 | Automatic VFIO loading for host device passthrough
 | .bin/.cue support in -cdrom
+| Shared folders that report themselves as (USB Sticks/CDs/Floppy Disks/Hard drives) to the guest
+| Improved help text for devices
 | (MORE TO COME)
