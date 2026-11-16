@@ -311,15 +311,9 @@ static void busmouse_realizefn(DeviceState *dev, Error **errp)
 {
     BusMouseState* s = BUS_MOUSE(dev);
 
-    if(s->bn > 3)
+    if(s->bn < 2 || s->bn > 3)
     {
-        error_setg(errp, "Can't support more than three buttons.");
-        return;
-    }
-
-    if(s->bn < 2)
-    {
-        error_setg(errp, "Can't support less than two buttons.");
+        error_setg(errp, "Button count must be between 2 and 3.");
         return;
     }
 
