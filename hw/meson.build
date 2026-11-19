@@ -71,3 +71,6 @@ subdir('vmapple')
 subdir('watchdog')
 subdir('xen')
 subdir('fsi')
+
+# Added by qemu-retro
+subdir('printer')

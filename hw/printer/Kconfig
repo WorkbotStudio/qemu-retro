@@ -1,0 +1,7 @@
+config PRINTING
+    bool
+    default y
+
+config EPSON
+    bool
+    default y if PRINTING

@@ -8,7 +8,7 @@ ROADMAP
 PRINTER EMULATION
 =============
 
-| Epson FX 80 (currently in development)
+| Text printing for the Epson FX 80 (currently in development)
 | (MORE TO COME)
 
 GPU EMULATION

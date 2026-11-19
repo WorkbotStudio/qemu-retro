@@ -6,14 +6,24 @@ FEATURES
 =============
 
 | - Microsoft Bus Mouse emulation (ported from 86Box's mouse_bus.c implementation):
-| Available under: "-device bus-mouse"
-| It makes the mouse work under Windows 1.0 without the need to replace mouse.drv
-| NOTE: Only the Microsoft Bus Mouse has been ported, so no InPort Bus Mouse (yet)
+|   Available under: "-device bus-mouse"
+|   It makes the mouse work under Windows 1.0 without the need to replace mouse.drv
+|   NOTE: Only the Microsoft Bus Mouse has been ported, so no InPort Bus Mouse (yet)
+
+| - The Epson FX-80 Printer
+|   Available under: "-device epson-fx80"
+|   Output directory can be controlled with the environment variable "PRINTER_OUTPUT_DIR"
+|   NOTE: This device is still in development, this means a few things:
+|   1. No text printing (Shouldn't be a problem under Windows 9x and later, as they print everything as graphics)
+|   2. Console logs (The terminal/log file/console WILL be spammed with debug messages when using this device)
+|   3. Performance (I am aware the performance isn't as good as it could be)
+|   4. File size (Currently the resulting .bmp images is uncompressed, resulting in every image being ~13.1 MB)
+|   5. Bugs (The device hasn't been extensively tested yet, so please don't expect 100% accurate results)
 
 WARNING
 =============
 
-This project is in very early development, so please be patient while i add new features to this fork.
+This is a hobby project of mine, so the development speed is... Unreliable, at best.
 
 Please see ROADMAP.rst for future plans
 
