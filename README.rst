@@ -9,7 +9,7 @@ FEATURES
 |   Available under: "-device bus-mouse"
 |   It makes the mouse work under Windows 1.0 without the need to replace mouse.drv
 |   NOTE: Only the Microsoft Bus Mouse has been ported, so no InPort Bus Mouse (yet)
-
+|
 | - The Epson FX-80 Printer
 |   Available under: "-device epson-fx80"
 |   Output directory can be controlled with the environment variable "PRINTER_OUTPUT_DIR"
