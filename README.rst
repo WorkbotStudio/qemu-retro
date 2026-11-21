@@ -14,11 +14,17 @@ FEATURES
 |   Available under: "-device epson-fx80"
 |   Output directory can be controlled with the environment variable "PRINTER_OUTPUT_DIR"
 |   NOTE: This device is still in development, this means a few things:
-|   1. No text printing (Shouldn't be a problem under Windows 9x and later, as they print everything as graphics)
+|   1. Limited text printing (Only basic text is supported, and it isn't very accurate yet)
 |   2. Console logs (The terminal/log file/console WILL be spammed with debug messages when using this device)
 |   3. Performance (I am aware the performance isn't as good as it could be)
 |   4. File size (Currently the resulting .bmp images is uncompressed, resulting in every image being ~13.1 MB)
 |   5. Bugs (The device hasn't been extensively tested yet, so please don't expect 100% accurate results)
+
+DEVICE BIOS/ROM dumps
+=============
+
+Some devices added by this project may require you to provide your own BIOS/ROM dumps,
+for more information, please see 'pc-bios/optional/ADDITIONAL-ROMS-GO-HERE.txt'
 
 WARNING
 =============

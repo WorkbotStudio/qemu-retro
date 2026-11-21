@@ -21,3 +21,7 @@ GTAGS
 *.swp
 *.patch
 *.gcov
+
+# Added by qemu-retro
+/pc-bios/optional/*
+!/pc-bios/optional/ADDITIONAL-ROMS-GO-HERE.txt

@@ -99,3 +99,6 @@ endif
 subdir('descriptors')
 subdir('dtb')
 subdir('keymaps')
+
+# Added by qemu-retro
+install_subdir('optional', install_dir: qemu_datadir)

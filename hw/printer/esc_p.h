@@ -48,6 +48,8 @@ struct EscpState
     GHashTable *commands;
     uint64_t sequence_size;
     uint8_t* current_sequence;
+
+    uint8_t* printable_glyphs;
     
     uint64_t current_read;
     EscCommand* current_cmd;
@@ -57,6 +59,7 @@ struct EscpState
 
     uint8_t pixels_per_newline;
     uint8_t pixels_per_character;
+    bool condensed;
 };
 
 struct EscCommand

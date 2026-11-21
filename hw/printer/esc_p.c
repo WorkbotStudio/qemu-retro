@@ -142,6 +142,36 @@ void escp_sequence_add(EscpState* esc, uint8_t data)
     }
 }
 
+void escp_print_character(EscpState* esc, uint8_t data);
+void escp_print_character(EscpState* esc, uint8_t data)
+{
+    uint8_t* glyph = &esc->printable_glyphs[data * 12];
+
+    bool top = ((glyph[0] >> 7) & 0x01);
+
+    uint8_t start = ((glyph[0] >> 4) & 0x7);
+
+    uint8_t end = (glyph[0] & 0xF);
+
+    //paper_advance(&esc->paper, start, 0);
+    for(int i = start; i < end; i++)
+    {
+        uint8_t byte = glyph[1 + i];
+        for(int j = 0; j < 8; j++)
+        {
+            bool bit = ((byte >> j) & 0x01);
+            uint8_t pos = (7 - j) * 3;
+            if(!top)
+            {
+                pos += 2 * 3;
+            }
+            uint8_t val = bit ? 0xFF : 0x00;
+            paper_set_block(&esc->paper, -1,pos - 1,3,3,val,val,val);
+        }
+        paper_advance(&esc->paper, 1,0);
+    }
+}
+
 void escp_read_byte(EscpState* esc, uint8_t data)
 {
     switch (esc->read_state)
@@ -189,7 +219,8 @@ void escp_read_byte(EscpState* esc, uint8_t data)
                 {
                     qemu_printf("PRINTABLE DATA: 0x%02x ('%c')\n", data, data);
                 }
-                paper_advance(&esc->paper,esc->pixels_per_character,0);
+                escp_print_character(esc, data);
+                paper_advance(&esc->paper,esc->condensed ? (esc->pixels_per_character / 2) : esc->pixels_per_character,0);
             }
             else
             {
@@ -491,6 +522,8 @@ void esc_cmd_set_condensed(EscpState* esc, EscData params)
         qemu_printf("esc_cmd_set_condensed requires extra data!\n");
         return;
     }
+
+    esc->condensed = (params.caller_params[0] == 1);
 
     qemu_printf("%s condensed command called!\n", (params.caller_params[0] == 1) ? "Select" : "Cancel");
 }

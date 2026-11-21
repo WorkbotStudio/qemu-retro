@@ -6,20 +6,10 @@
 #include "hw/core/qdev-properties-system.h"
 #include "system/system.h"
 #include "hw/printer/esc_p.h"
-
-//#include "qemu/qemu-print.h"
+#include "qemu/datadir.h"
+#include "qapi/error.h"
 
 #define TYPE_EPSON_FX80 "epson-fx80"
-
-// NOTE: A few things i've noticed so far:
-// 1: It starts in text mode.
-// 2: message 0x12 means it shouldn't print?
-// 3: message 0x0f means begin printing?
-// 4: the 0x40 (@) command is to reset
-// 5: the 0x0c (FF) command is apparently to output the paper
-// 6: We only read data every time the strobe command is passed
-
-// NOTE: Will probably need the epson fx 80's rom (for character sets)
 
 OBJECT_DECLARE_SIMPLE_TYPE(Fx80State, EPSON_FX80)
 
@@ -297,7 +287,7 @@ static const EscCommand fx80_commands[] = {
         .on_command = esc_cmd_set_condensed        
     },
     {
-        .sequence_size = 2,
+        .sequence_size = 1,
         .sequence = (uint8_t[]) {0x0F},
         .extra_data = (uint8_t[]) {0x01},
         .on_command = esc_cmd_set_condensed        
@@ -323,10 +313,40 @@ static const EscCommand fx80_commands[] = {
 
 static void fx80_realizefn(DeviceState *dev, Error **errp)
 {
+    char* romfile = qemu_find_file(QEMU_FILE_TYPE_BIOS, "optional/epson_8426k9_m1206ba029_read_as_27c128.bin");
+    if(romfile == NULL)
+    {
+        error_setg(errp, "Can't operate without ROM dump (See ADDITIONAL-ROMS-GO-HERE.txt)");
+        return;
+    }
+
     ISADevice *isadev = ISA_DEVICE(dev);
     Fx80State *s = EPSON_FX80(dev);
     
     escp_init(&s->esc,fx80_commands, VAR_9PIN);
+
+    FILE *fp = fopen(romfile, "rb");
+
+    if(fp == NULL)
+    {
+        error_setg(errp, "Failed to open ROM dump.");
+        return;
+    }
+    
+    if(fseek(fp, 0x17A3, SEEK_SET) != 0)
+    {
+        error_setg(errp, "Failed to find glyph table in ROM dump.");
+        return;
+    }
+
+    s->esc.printable_glyphs = malloc(256*12);
+    if(fread(s->esc.printable_glyphs, sizeof(uint8_t), 256*12, fp) != 256*12)
+    {
+        error_setg(errp, "Failed to read glyph table from ROM dump.");
+        return;
+    }
+
+    fclose(fp);
 
     memory_region_init_io(&s->io, OBJECT(s), &fx80_ops, s, "custom-lpt", 3);
     isa_register_ioport(isadev, &s->io, 0x378);

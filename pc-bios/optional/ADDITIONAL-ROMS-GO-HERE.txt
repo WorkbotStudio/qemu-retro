@@ -1,0 +1,10 @@
+Here is where you should place the additional bios/rom dumps.
+
+These rom dumps are needed for sertain devices in qemu-retro
+to function, but are not distributed by default due to legal
+reasons.
+
+Here is a list of devices that need additional bios/rom
+dumps, the expected bios/rom file names, and explanations of
+each rom/bios file:
+epson-fx80: epson_8426k9_m1206ba029_read_as_27c128.bin (the ROM of the Epson FX-80, needed for printable glyphs)
