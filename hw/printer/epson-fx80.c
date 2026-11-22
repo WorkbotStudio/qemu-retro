@@ -325,6 +325,7 @@ static void fx80_realizefn(DeviceState *dev, Error **errp)
     
     escp_init(&s->esc,fx80_commands, VAR_9PIN);
 
+    // NOTE: Got these numbers from https://github.com/RealDeuce/epsonfx80/blob/master/docs/fx80_emulator_notes.md
     FILE *fp = fopen(romfile, "rb");
 
     if(fp == NULL)

@@ -60,6 +60,7 @@ struct EscpState
     uint8_t pixels_per_newline;
     uint8_t pixels_per_character;
     bool condensed;
+    bool italic;
 };
 
 struct EscCommand

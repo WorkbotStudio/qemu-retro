@@ -4,13 +4,6 @@
 // NOTE: For research purposes "Command list by ascii order" can be searched for a list of all available commands
 
 // TODO: Good news is: https://www.yout-ube.com/watch?v=inhZC75_mdU has a reference for the Windows XP test page,
-// The bad news is: Mine only looks like that from a distance while squinting really hard,
-// guessing it comes down to most (if not all) numbers being fucked
-
-// UPDATE: It's getting closer now! (As in, you can actually see text), however, the "LF/ESC J" combo is splitting up
-// lines weirdly
-
-// UPDATE #2: Still not completely correct, but it's getting closer!
 
 // Is this entire file over-engineered? Probably.
 // Do i care? No, not really.
@@ -142,10 +135,12 @@ void escp_sequence_add(EscpState* esc, uint8_t data)
     }
 }
 
+
+// NOTE: The implementation details are based on https://github.com/RealDeuce/epsonfx80/blob/master/docs/fx80_emulator_notes.md
 void escp_print_character(EscpState* esc, uint8_t data);
 void escp_print_character(EscpState* esc, uint8_t data)
 {
-    uint8_t* glyph = &esc->printable_glyphs[data * 12];
+    uint8_t* glyph = &esc->printable_glyphs[(data + (esc->italic ? 128 : 0)) * 12];
 
     bool top = ((glyph[0] >> 7) & 0x01);
 
@@ -153,7 +148,6 @@ void escp_print_character(EscpState* esc, uint8_t data)
 
     uint8_t end = (glyph[0] & 0xF);
 
-    //paper_advance(&esc->paper, start, 0);
     for(int i = start; i < end; i++)
     {
         uint8_t byte = glyph[1 + i];
@@ -170,6 +164,12 @@ void escp_print_character(EscpState* esc, uint8_t data)
         }
         paper_advance(&esc->paper, 1,0);
     }
+
+    // TODO: Condensed multiplier is probably not entirely correct, but it's good enough for now.
+    uint8_t spacing = esc->condensed ? (esc->pixels_per_character * 0.6) : esc->pixels_per_character;
+    spacing -= (end - start);
+
+    paper_advance(&esc->paper,spacing,0);
 }
 
 void escp_read_byte(EscpState* esc, uint8_t data)
@@ -220,7 +220,6 @@ void escp_read_byte(EscpState* esc, uint8_t data)
                     qemu_printf("PRINTABLE DATA: 0x%02x ('%c')\n", data, data);
                 }
                 escp_print_character(esc, data);
-                paper_advance(&esc->paper,esc->condensed ? (esc->pixels_per_character / 2) : esc->pixels_per_character,0);
             }
             else
             {
@@ -508,6 +507,8 @@ void esc_cmd_set_italic(EscpState* esc, EscData params)
         qemu_printf("esc_cmd_set_italic requires extra data!\n");
         return;
     }
+
+    esc->italic = (params.caller_params[0] == 1);
 
     qemu_printf("%s italic command called!\n", (params.caller_params[0] == 1) ? "Enable" : "Disable");
 }

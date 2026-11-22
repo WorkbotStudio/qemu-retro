@@ -14,7 +14,7 @@ FEATURES
 |   Available under: "-device epson-fx80"
 |   Output directory can be controlled with the environment variable "PRINTER_OUTPUT_DIR"
 |   NOTE: This device is still in development, this means a few things:
-|   1. Limited text printing (Only basic text is supported, and it isn't very accurate yet)
+|   1. Limited text printing (Not every mode is supported yet, and what is supported may not be 100% accurate)
 |   2. Console logs (The terminal/log file/console WILL be spammed with debug messages when using this device)
 |   3. Performance (I am aware the performance isn't as good as it could be)
 |   4. File size (Currently the resulting .bmp images is uncompressed, resulting in every image being ~13.1 MB)
