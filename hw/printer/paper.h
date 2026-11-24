@@ -9,6 +9,7 @@ struct PaperState
     int64_t current_y;
     uint64_t width;
     uint64_t height;
+    uint64_t buffer_size;
     uint8_t* buffer;
 };
 

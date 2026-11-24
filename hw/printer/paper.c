@@ -6,13 +6,20 @@ void paper_init(PaperState* paper, uint64_t width, uint64_t height)
     paper->height = height;
     paper->current_x = 0;
     paper->current_y = 0;
+
     if(paper->buffer != NULL)
     {
         free(paper->buffer);
         paper->buffer = NULL;
     }
-    paper->buffer = malloc(paper->width * paper->height * 3);
-    memset(paper->buffer, 255, paper->width * paper->height * 3);
+
+    uint64_t stride = paper->width * 3;
+    stride += (4-(stride)%4)%4;
+
+    paper->buffer_size = stride * paper->height;
+
+    paper->buffer = malloc(paper->buffer_size);
+    memset(paper->buffer, 255, paper->buffer_size);
 }
 
 void paper_advance(PaperState* paper, int64_t x, int64_t y)
@@ -29,7 +36,7 @@ void paper_reset_horizontal(PaperState* paper)
 void paper_set_pixel(PaperState* paper, int64_t relative_x, int64_t relative_y, uint8_t r, uint8_t g, uint8_t b)
 {
     int64_t x = (paper->current_x + relative_x);
-    int64_t y = (paper->current_y + relative_y);
+    int64_t y = (paper->height - (paper->current_y + relative_y)) - 1;
 
     if(x >= paper->width || x < 0)
     {
@@ -52,9 +59,9 @@ void paper_set_pixel(PaperState* paper, int64_t relative_x, int64_t relative_y, 
 
 void paper_set_block(PaperState* paper, int64_t relative_x, int64_t relative_y, int64_t width, int64_t height, uint8_t r, uint8_t g, uint8_t b)
 {
-    for(int x = 0; x < width; x++)
+    for(int y = 0; y < height; y++)
     {
-        for(int y = 0; y < height; y++)
+        for(int x = 0; x < width; x++)
         {
             paper_set_pixel(paper,relative_x + x, relative_y + y, r, g, b);
         }
@@ -67,7 +74,7 @@ void paper_finish(PaperState* paper, const char* filename)
 {
     FILE *fp = fopen(filename, "wb");
 
-    int filesize = HEADER_SIZE + 3*paper->width*paper->height;
+    int filesize = HEADER_SIZE + paper->buffer_size;
     unsigned char header[14] = {
         'B','M', // Signature
         0,0,0,0, // File size
@@ -95,7 +102,6 @@ void paper_finish(PaperState* paper, const char* filename)
         0,0,0,0, /// Color table count
         0,0,0,0, /// Important color count
     };
-    unsigned char bmppad[3] = {0,0,0};
 
     // Image width
     info[ 4] = (paper->width);
@@ -111,11 +117,7 @@ void paper_finish(PaperState* paper, const char* filename)
     fwrite(header,1,14,fp);
     fwrite(info,1,40,fp);
 
-    for(int i=0; i<paper->height; i++)
-    {
-        fwrite(paper->buffer+(paper->width*(paper->height-i-1)*3),3,paper->width,fp);
-        fwrite(bmppad,1,(4-(paper->width*3)%4)%4,fp);
-    }
+    fwrite(paper->buffer, 1, paper->buffer_size, fp);
 
     fclose(fp);
 
