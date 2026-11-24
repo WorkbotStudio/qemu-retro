@@ -147,22 +147,30 @@ void escp_print_character(EscpState* esc, uint8_t data)
     uint8_t start = ((glyph[0] >> 4) & 0x7);
 
     uint8_t end = (glyph[0] & 0xF);
+    uint8_t passes_width = esc->doublewidth ? 2 : 1;
+    uint8_t passes_height = esc->doublestrike ? 2 : 1;
 
     for(int i = start; i < end; i++)
     {
-        uint8_t byte = glyph[1 + i];
-        for(int j = 0; j < 8; j++)
+        for(int k = 0; k < passes_width; k++)
         {
-            bool bit = ((byte >> j) & 0x01);
-            uint8_t pos = (7 - j) * 3;
-            if(!top)
+            uint8_t byte = glyph[1 + i];
+            for(int j = 0; j < 8; j++)
             {
-                pos += 2 * 3;
+                bool bit = ((byte >> j) & 0x01);
+                uint8_t pos = (7 - j) * 3;
+                if(!top)
+                {
+                    pos += 2 * 3;
+                }
+                uint8_t val = bit ? 0xFF : 0x00;
+                for(int h = 0; h < passes_height; h++)
+                {
+                    paper_set_block(&esc->paper, -1,pos - 1 + h,3,3,val,val,val);
+                }
             }
-            uint8_t val = bit ? 0xFF : 0x00;
-            paper_set_block(&esc->paper, -1,pos - 1,3,3,val,val,val);
+            paper_advance(&esc->paper, 1,0);
         }
-        paper_advance(&esc->paper, 1,0);
     }
 
     // TODO: Condensed multiplier is probably not entirely correct, but it's good enough for now.
@@ -480,6 +488,8 @@ void esc_cmd_set_doublewidth(EscpState* esc, EscData params)
         return;
     }
 
+    esc->doublewidth = (params.caller_params[0] == 1);
+
     qemu_printf("%s double width command called!\n", (params.caller_params[0] == 1) ? "Enable" : "Disable");
 }
 
@@ -493,6 +503,8 @@ void esc_cmd_set_doublestrike(EscpState* esc, EscData params)
         qemu_printf("esc_cmd_set_doublestrike requires extra data!\n");
         return;
     }
+
+    esc->doublestrike = (params.caller_params[0] == 1);
     
     qemu_printf("%s double strike command called!\n", (params.caller_params[0] == 1) ? "Enable" : "Disable");
 }
