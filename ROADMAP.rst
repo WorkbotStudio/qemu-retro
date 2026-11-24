@@ -8,7 +8,7 @@ ROADMAP
 PRINTER EMULATION
 =============
 
-| Text printing for the Epson FX 80 (currently in development)
+| Lossless compression for printing results
 | (MORE TO COME)
 
 GPU EMULATION
@@ -17,6 +17,13 @@ GPU EMULATION
 | 3DFX voodoo series
 | nVIDIA riva 128 series
 | nVIDIA riva TNT series
+| (MORE TO COME)
+
+NETWORK ADAPTER EMULATION
+=============
+
+| Dialup emulation (will still be a passthrough to the host's network adapters)
+| Wireless emulation (will still be a passthrough to the host's network adapters)
 | (MORE TO COME)
 
 BUG FIXES
