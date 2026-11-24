@@ -44,6 +44,7 @@ struct Fx80State
     uint8_t status;
 
     EscpState esc;
+    uint16_t address;
 };
 
 typedef struct Fx80State Fx80State;
@@ -313,15 +314,15 @@ static const EscCommand fx80_commands[] = {
 
 static void fx80_realizefn(DeviceState *dev, Error **errp)
 {
+    ISADevice *isadev = ISA_DEVICE(dev);
+    Fx80State *s = EPSON_FX80(dev);
+
     char* romfile = qemu_find_file(QEMU_FILE_TYPE_BIOS, "optional/epson_8426k9_m1206ba029_read_as_27c128.bin");
     if(romfile == NULL)
     {
         error_setg(errp, "Can't operate without ROM dump (See ADDITIONAL-ROMS-GO-HERE.txt)");
         return;
     }
-
-    ISADevice *isadev = ISA_DEVICE(dev);
-    Fx80State *s = EPSON_FX80(dev);
     
     escp_init(&s->esc,fx80_commands, VAR_9PIN);
 
@@ -337,6 +338,7 @@ static void fx80_realizefn(DeviceState *dev, Error **errp)
     if(fseek(fp, 0x17A3, SEEK_SET) != 0)
     {
         error_setg(errp, "Failed to find glyph table in ROM dump.");
+        fclose(fp);
         return;
     }
 
@@ -344,13 +346,20 @@ static void fx80_realizefn(DeviceState *dev, Error **errp)
     if(fread(s->esc.printable_glyphs, sizeof(uint8_t), 256*12, fp) != 256*12)
     {
         error_setg(errp, "Failed to read glyph table from ROM dump.");
+        fclose(fp);
         return;
     }
 
     fclose(fp);
 
-    memory_region_init_io(&s->io, OBJECT(s), &fx80_ops, s, "custom-lpt", 3);
-    isa_register_ioport(isadev, &s->io, 0x378);
+    if(s->address != 0x378 && s->address != 0x278 && s->address != 0x3BC)
+    {
+        error_setg(errp, "LPT port must either be 0x378, 0x278 or 0x3BC.");
+        return;
+    }
+
+    memory_region_init_io(&s->io, OBJECT(s), &fx80_ops, s, "epson-fx80", 3);
+    isa_register_ioport(isadev, &s->io, s->address);
 }
 
 static void fx80_reset(DeviceState *dev)
@@ -369,11 +378,16 @@ static void fx80_reset(DeviceState *dev)
     escp_reset(&s->esc);
 }
 
+static const Property fx80_props[] = {
+    DEFINE_PROP_UINT16("port", Fx80State, address, 0x378)
+};
+
 static void fx80_class_init(ObjectClass *oc, const void *data)
 {
     DeviceClass *dc = DEVICE_CLASS(oc);
 
     dc->realize = fx80_realizefn;
+    device_class_set_props(dc,fx80_props);
     device_class_set_legacy_reset(dc, fx80_reset);
     set_bit(DEVICE_CATEGORY_INPUT, dc->categories);
 }
