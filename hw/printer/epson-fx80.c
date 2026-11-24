@@ -122,192 +122,161 @@ static const MemoryRegionOps fx80_ops = {
 static const EscCommand fx80_commands[] = {
     {
         .is_marker = true,
-        .sequence_size = 1,
-        .sequence = (uint8_t[]) {0x1B}
+        CMD_SEQUENCE(0x1B)
     },
     {
-        .sequence_size = 1,
-        .sequence = (uint8_t[]) {0x0D},
+        CMD_SEQUENCE(0x0D),
         .on_command = esc_cmd_return
     },
     {
-        .sequence_size = 1,
-        .sequence = (uint8_t[]) {0x0A},
+        CMD_SEQUENCE(0x0A),
         .on_command = esc_cmd_newline
     },
     {
-        .sequence_size = 1,
-        .sequence = (uint8_t[]) {0x0E},
+        CMD_SEQUENCE(0x0E),
         .extra_data = (uint8_t[]) {0x01},
         .on_command = esc_cmd_set_doublewidth
     },
     {
-        .sequence_size = 1,
-        .sequence = (uint8_t[]) {0x14},
+        CMD_SEQUENCE(0x14),
         .extra_data = (uint8_t[]) {0x00},
         .on_command = esc_cmd_set_doublewidth
     },
     {
-        .sequence_size = 2,
-        .sequence = (uint8_t[]) {0x1B, 0x47},
+        CMD_SEQUENCE(0x1B, 0x47),
         .extra_data = (uint8_t[]) {0x01},
         .on_command = esc_cmd_set_doublestrike
     },
     {
-        .sequence_size = 2,
-        .sequence = (uint8_t[]) {0x1B, 0x48},
+        CMD_SEQUENCE(0x1B, 0x48),
         .extra_data = (uint8_t[]) {0x00},
         .on_command = esc_cmd_set_doublestrike
     },
     {
-        .sequence_size = 2,
-        .sequence = (uint8_t[]) {0x1B, 0x34},
+        CMD_SEQUENCE(0x1B, 0x34),
         .extra_data = (uint8_t[]) {0x01},
         .on_command = esc_cmd_set_italic
     },
     {
-        .sequence_size = 2,
-        .sequence = (uint8_t[]) {0x1B, 0x35},
+        CMD_SEQUENCE(0x1B, 0x35),
         .extra_data = (uint8_t[]) {0x00},
         .on_command = esc_cmd_set_italic
     },
     {
-        .sequence_size = 2,
-        .sequence = (uint8_t[]) {0x1B, 0x4D},
+        CMD_SEQUENCE(0x1B, 0x4D),
         .extra_data = (uint8_t[]) {0x00},
         .on_command = esc_cmd_select_cpi
     },
     {
-        .sequence_size = 2,
-        .sequence = (uint8_t[]) {0x1B, 0x50},
+        CMD_SEQUENCE(0x1B, 0x50),
         .extra_data = (uint8_t[]) {0x01},
         .on_command = esc_cmd_select_cpi
     },
     {
-        .sequence_size = 2,
-        .sequence = (uint8_t[]) {0x1B, 0x67},
+        CMD_SEQUENCE(0x1B, 0x67),
         .extra_data = (uint8_t[]) {0x02},
         .on_command = esc_cmd_select_cpi
     },
     {
-        .sequence_size = 2,
-        .sequence = (uint8_t[]) {0x1B, 0x4B},
+        CMD_SEQUENCE(0x1B, 0x4B),
         .num_params = 2,
         .on_params = esc_data_graphics,
         .extra_data = (uint8_t[]) {0x00},
         .on_command = esc_cmd_graphics
     },
     {
-        .sequence_size = 2,
-        .sequence = (uint8_t[]) {0x1B, 0x4C},
+        CMD_SEQUENCE(0x1B, 0x4C),
         .num_params = 2,
         .on_params = esc_data_graphics,
         .extra_data = (uint8_t[]) {0x01},
         .on_command = esc_cmd_graphics
     },
     {
-        .sequence_size = 2,
-        .sequence = (uint8_t[]) {0x1B, 0x59},
+        CMD_SEQUENCE(0x1B, 0x59),
         .num_params = 2,
         .on_params = esc_data_graphics,
         .extra_data = (uint8_t[]) {0x02},
         .on_command = esc_cmd_graphics
     },
     {
-        .sequence_size = 2,
-        .sequence = (uint8_t[]) {0x1B, 0x5A},
+        CMD_SEQUENCE(0x1B, 0x5A),
         .num_params = 2,
         .on_params = esc_data_graphics,
         .extra_data = (uint8_t[]) {0x03},
         .on_command = esc_cmd_graphics
     },
     {
-        .sequence_size = 2,
-        .sequence = (uint8_t[]) {0x1B, 0x30},
+        CMD_SEQUENCE(0x1B, 0x30),
         .extra_data = (uint8_t[]) {0x00},
         .on_command = esc_cmd_set_line_spacing
     },
     {
-        .sequence_size = 2,
-        .sequence = (uint8_t[]) {0x1B, 0x31},
+        CMD_SEQUENCE(0x1B, 0x31),
         .extra_data = (uint8_t[]) {0x01},
         .on_command = esc_cmd_set_line_spacing
     },
     {
-        .sequence_size = 2,
-        .sequence = (uint8_t[]) {0x1B, 0x32},
+        CMD_SEQUENCE(0x1B, 0x32),
         .extra_data = (uint8_t[]) {0x02},
         .on_command = esc_cmd_set_line_spacing
     },
     {
-        .sequence_size = 2,
-        .sequence = (uint8_t[]) {0x1B, 0x33},
+        CMD_SEQUENCE(0x1B, 0x33),
         .num_params = 1,
         .extra_data = (uint8_t[]) {0x04},
         .on_command = esc_cmd_set_line_spacing
     },
     {
-        .sequence_size = 2,
-        .sequence = (uint8_t[]) {0x1B, 0x43},
+        CMD_SEQUENCE(0x1B, 0x43),
         .num_params = 1,
         .on_command = esc_cmd_page_length_lines
     },
     {
-        .sequence_size = 2,
-        .sequence = (uint8_t[]) {0x1B, 0x74},
+        CMD_SEQUENCE(0x1B, 0x74),
         .num_params = 1,
         .on_command = esc_cmd_charset
     },
     {
-        .sequence_size = 2,
-        .sequence = (uint8_t[]) {0x1B, 0x52},
+        CMD_SEQUENCE(0x1B, 0x52),
         .num_params = 1,
         .on_command = esc_cmd_charset_international
     },
     {
-        .sequence_size = 2,
-        .sequence = (uint8_t[]) {0x1B, 0x36},
+        CMD_SEQUENCE(0x1B, 0x36),
         .extra_data = (uint8_t[]) {0x01},
         .on_command = esc_cmd_set_upperctrl_printing
     },
     {
-        .sequence_size = 2,
-        .sequence = (uint8_t[]) {0x1B, 0x36},
+        CMD_SEQUENCE(0x1B, 0x37),
         .extra_data = (uint8_t[]) {0x00},
         .on_command = esc_cmd_set_upperctrl_printing
     },
     {
-        .sequence_size = 1,
-        .sequence = (uint8_t[]) {0x0C},
+        CMD_SEQUENCE(0x0C),
         .on_command = esc_cmd_dump_paper
     },
     {
-        .sequence_size = 1,
-        .sequence = (uint8_t[]) {0x12},
+        CMD_SEQUENCE(0x12),
         .extra_data = (uint8_t[]) {0x00},
         .on_command = esc_cmd_set_condensed        
     },
     {
-        .sequence_size = 1,
-        .sequence = (uint8_t[]) {0x0F},
+        CMD_SEQUENCE(0x0F),
         .extra_data = (uint8_t[]) {0x01},
         .on_command = esc_cmd_set_condensed        
     },
     {
-        .sequence_size = 2,
-        .sequence = (uint8_t[]) {0x1B, 0x0F},
+        CMD_SEQUENCE(0x1B, 0x0F),
         .extra_data = (uint8_t[]) {0x01},
         .on_command = esc_cmd_set_condensed        
     },
     {
-        .sequence_size = 2,
-        .sequence = (uint8_t[]) {0x1B, 0x4A},
+        CMD_SEQUENCE(0x1B, 0x4A),
         .num_params = 1,
         .on_command = esc_cmd_move_paper
     },
     {
-        .sequence_size = 2,
-        .sequence = (uint8_t[]) {0x1B, 0x40},
+        CMD_SEQUENCE(0x1B, 0x40),
         .on_command = esc_cmd_reset
     }
 };

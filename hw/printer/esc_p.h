@@ -84,6 +84,11 @@ struct EscCommand
     void (*on_command)(EscpState* esc, EscData params);
 };
 
+// Defines the sequence used to detect an EscCommand entry.
+#define CMD_SEQUENCE(...) \
+.sequence_size = (sizeof((uint8_t[]){__VA_ARGS__}) / sizeof(((uint8_t[]){__VA_ARGS__})[0])), \
+.sequence = (uint8_t[]){__VA_ARGS__}
+
 #define escp_init(esc, commands, variant) \
 size_t commands_count_ = ARRAY_SIZE(commands); \
 escp_init_n((esc), (commands), commands_count_, variant);
