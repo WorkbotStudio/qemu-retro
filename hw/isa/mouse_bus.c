@@ -118,9 +118,9 @@ struct BusMouseState
     uint8_t control_val;
     uint8_t sig_val;
 
-    int axis[INPUT_AXIS__MAX];
+    int8_t axis[INPUT_AXIS__MAX];
     bool btns[INPUT_BUTTON__MAX];
-    int axis_current[INPUT_AXIS__MAX];
+    int8_t axis_current[INPUT_AXIS__MAX];
 
     uint16_t base;
     uint8_t irq_num;
@@ -170,7 +170,7 @@ static void busmouse_ioport_write(void *opaque, hwaddr addr, uint64_t val,
     case BUSM_PORT_CONFIG:
         if(val & DEVICE_ACTIVE)
         {
-            s->flags |= FLAG_ENABLED;
+            s->flags |= (FLAG_ENABLED | FLAG_TIMER_INT);
             s->control_val = 0x0F & ~IRQ_MASK;
         }
         else
@@ -285,10 +285,15 @@ static void busmouse_input_sync(DeviceState *dev)
         return;
     }
 
+    if(s->flags & FLAG_TIMER_INT)
+    {
+        qemu_irq_raise(s->irq);
+    }
+
     if(!(s->flags & FLAG_HOLD))
     {
-        memcpy(&s->axis_current, &s->axis, 2*4);
-        memset(&s->axis, 0, 2*4);
+        memcpy(&s->axis_current, &s->axis, 2);
+        memset(&s->axis, 0, 2);
         s->current_b = ((s->btns[0] * 1) << 2) | ((s->btns[2] * 2) >> 1);
         if(s->bn == 3)
         {
@@ -296,8 +301,6 @@ static void busmouse_input_sync(DeviceState *dev)
         }
         s->current_b = ((s->current_b ^ 7) << 5);
     }
-
-    qemu_irq_raise(s->irq);
 }
 
 static const QemuInputHandler busmouse_handler = {
