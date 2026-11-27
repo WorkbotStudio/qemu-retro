@@ -29,7 +29,6 @@ NETWORK ADAPTER EMULATION
 BUG FIXES
 =============
 
-| gtk mouse capture under wayland not restraining the mouse properly
 | "-serial mouse" not working under Windows 1.0 without copying mouse.drv from Windows 2.0
 | Windows 98 freezing and causing screen corruption during Plug and Play detection
 | (MORE TO COME)

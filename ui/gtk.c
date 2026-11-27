@@ -82,6 +82,8 @@
 
 
 #ifdef GDK_WINDOWING_WAYLAND
+#include "ui/pointer-constraints-unstable-v1.h"
+#include "ui/relative-pointer-unstable-v1.h"
 /* Gtk2 compat */
 #ifndef GDK_IS_WAYLAND_DISPLAY
 #define GDK_IS_WAYLAND_DISPLAY(dpy) (dpy != NULL)
@@ -118,6 +120,14 @@
 #endif
 
 #define HOTKEY_MODIFIERS        (GDK_CONTROL_MASK | GDK_MOD1_MASK)
+
+#ifdef GDK_WINDOWING_WAYLAND
+static struct zwp_pointer_constraints_v1 *pointer_constraints = NULL;
+static struct zwp_locked_pointer_v1 *locked_pointer = NULL;
+struct zwp_relative_pointer_manager_v1 *relative_pointer_manager = NULL;
+struct zwp_relative_pointer_v1 *relative_pointer = NULL;
+static VirtualConsole *relative_vc = NULL;
+#endif
 
 static const guint16 *keycode_map;
 static size_t keycode_maplen;
@@ -1767,6 +1777,95 @@ static void gd_menu_zoom_fit(GtkMenuItem *item, void *opaque)
     gd_update_full_redraw(vc);
 }
 
+#ifdef GDK_WINDOWING_WAYLAND
+static void registry_handle_global(void *data, struct wl_registry *registry,
+                                   uint32_t name, const char *interface, uint32_t version)
+{
+    if (strcmp(interface, zwp_pointer_constraints_v1_interface.name) == 0)
+    {
+        pointer_constraints = wl_registry_bind(registry, name,
+                                               &zwp_pointer_constraints_v1_interface, 1);
+    }
+    else if (strcmp(interface, zwp_relative_pointer_manager_v1_interface.name) == 0)
+    {
+        relative_pointer_manager = wl_registry_bind(registry, name,
+                                                    &zwp_relative_pointer_manager_v1_interface, 1);
+    }
+}
+
+static void relative_pointer_handle_relative_motion(void *data,
+                                                    struct zwp_relative_pointer_v1 *zwp_relative_pointer_v1,
+                                                    uint32_t utime_hi,
+                                                    uint32_t utime_lo,
+                                                    wl_fixed_t dx,
+                                                    wl_fixed_t dy,
+                                                    wl_fixed_t dx_unaccel,
+                                                    wl_fixed_t dy_unaccel)
+{
+    static double x;
+    static double y;
+
+    x += wl_fixed_to_double(dx);
+    y += wl_fixed_to_double(dy);
+
+    int x_int = x;
+    int y_int = y;
+
+    bool send_update = false;
+    if(x_int > 0 || x_int < 0)
+    {
+        send_update = true;
+        x = 0;
+    }
+    if(y_int > 0 || y_int < 0)
+    {
+        send_update = true;
+        y = 0;
+    }
+
+    if(send_update)
+    {
+        qemu_input_queue_rel(relative_vc->gfx.dcl.con, INPUT_AXIS_X, x_int);
+        qemu_input_queue_rel(relative_vc->gfx.dcl.con, INPUT_AXIS_Y, y_int);
+        qemu_input_event_sync();
+    }
+}
+
+static const struct zwp_relative_pointer_v1_listener relative_pointer_listener = {
+    .relative_motion = relative_pointer_handle_relative_motion,
+};
+
+static void wayland_unlock_pointer(void)
+{
+    if(locked_pointer)
+    {
+        zwp_locked_pointer_v1_destroy(locked_pointer);
+        locked_pointer = NULL;
+        zwp_relative_pointer_v1_destroy(relative_pointer);
+        relative_pointer = NULL;
+        relative_vc = NULL;
+    }
+}
+
+static void wayland_lock_pointer(GdkDisplay *display, GdkWindow *window, VirtualConsole *vc)
+{
+    if(qemu_input_is_absolute(vc->gfx.dcl.con))
+    {
+        return;
+    }
+
+    relative_vc = vc;
+
+    struct wl_surface* surface = gdk_wayland_window_get_wl_surface(window);
+    struct wl_pointer* pointer = gdk_wayland_device_get_wl_pointer(gd_get_pointer(display));
+    locked_pointer = zwp_pointer_constraints_v1_lock_pointer(pointer_constraints, surface, pointer, NULL,
+                                                             ZWP_POINTER_CONSTRAINTS_V1_LIFETIME_PERSISTENT);
+
+    relative_pointer = zwp_relative_pointer_manager_v1_get_relative_pointer(relative_pointer_manager, pointer);
+    zwp_relative_pointer_v1_add_listener(relative_pointer, &relative_pointer_listener, NULL);
+}
+#endif
+
 static void gd_grab_update(VirtualConsole *vc, bool kbd, bool ptr)
 {
     GdkDisplay *display = gtk_widget_get_display(vc->gfx.drawing_area);
@@ -1781,7 +1880,18 @@ static void gd_grab_update(VirtualConsole *vc, bool kbd, bool ptr)
     if (ptr) {
         caps |= GDK_SEAT_CAPABILITY_ALL_POINTING;
         cursor = vc->s->null_cursor;
+
+#ifdef GDK_WINDOWING_WAYLAND
+        wayland_unlock_pointer();
+        wayland_lock_pointer(display, window, vc);
     }
+    else
+    {
+        wayland_unlock_pointer();
+    }
+#else
+    }
+#endif
 
     if (caps) {
         gdk_seat_grab(seat, window, caps, false, cursor,
@@ -2877,6 +2987,16 @@ static void gtk_display_init(DisplayState *ds, DisplayOptions *opts)
     gtk_box_pack_start(GTK_BOX(s->vbox), s->notebook, TRUE, TRUE, 0);
 
     gtk_container_add(GTK_CONTAINER(s->window), s->vbox);
+
+#ifdef GDK_WINDOWING_WAYLAND
+    static const struct wl_registry_listener registry_listener = {
+        .global = registry_handle_global,
+    };
+    struct wl_display* wl_display = gdk_wayland_display_get_wl_display(window_display);
+    struct wl_registry* wl_registry = wl_display_get_registry(wl_display);
+    wl_registry_add_listener(wl_registry, &registry_listener, NULL);
+    wl_display_roundtrip(wl_display);
+#endif
 
     gtk_widget_show_all(s->window);
 

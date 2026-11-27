@@ -20,6 +20,13 @@ FEATURES
 |   4. File size (Currently the resulting .bmp images is uncompressed, resulting in every image being ~13.1 MB)
 |   5. Bugs (The device hasn't been extensively tested yet, so please don't expect 100% accurate results)
 
+FIXED BUGS
+=============
+
+| - GTK mouse capture under wayland not restraining the mouse properly
+|   This does add wayland-client, wayland-protocols and wayland-scanner as dependencies when compiling in
+|   a wayland environment.
+
 DEVICE BIOS/ROM dumps
 =============
 

@@ -1920,6 +1920,8 @@ endif
 gtk = not_found
 gtkx11 = not_found
 vte = not_found
+wayland_client = not_found
+wayland_protocols = not_found
 
 if get_option('gtk') \
              .disable_auto_if(not have_system) \
@@ -1940,6 +1942,13 @@ if get_option('gtk') \
       vte = dependency('vte-2.91',
                        method: 'pkg-config',
                        required: get_option('vte'))
+    endif
+
+    if cc.has_define('GDK_WINDOWING_WAYLAND', dependencies:[gtk], prefix: '#include <gdk/gdk.h>')
+      wayland_protocols = dependency('wayland-protocols')
+      wayland_client = dependency('wayland-client', required: true, method: 'pkg-config')
+      wayland_client = declare_dependency(dependencies: [wayland_client], version: wayland_client.version())
+      find_program('wayland-scanner', required: true)
     endif
   endif
 endif

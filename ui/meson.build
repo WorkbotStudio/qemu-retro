@@ -62,6 +62,55 @@ system_ss.add(files(
 if have_hmp
   system_ss.add(files('ui-hmp-cmds.c'))
 endif
+if wayland_client.found()
+  system_ss.add(wayland_client)
+  wl_protocols_dir = wayland_protocols.get_variable('pkgdatadir')
+  constraints_h = custom_target(
+    'pointer-constraints-unstable-v1-h',
+    input: wl_protocols_dir / 'unstable/pointer-constraints/pointer-constraints-unstable-v1.xml',
+    output: 'pointer-constraints-unstable-v1.h',
+    command: [
+      'wayland-scanner',
+      'client-header',
+      '@INPUT@',
+      '@OUTPUT@'
+    ]
+  )
+  constraints_c = custom_target(
+    'pointer-constraints-unstable-v1-c',
+    input: wl_protocols_dir / 'unstable/pointer-constraints/pointer-constraints-unstable-v1.xml',
+    output: 'pointer-constraints-unstable-v1.c',
+    command: [
+      'wayland-scanner',
+      'public-code',
+      '@INPUT@',
+      '@OUTPUT@'
+    ]
+  )
+  relative_h = custom_target(
+    'relative-pointer-unstable-v1-h',
+    input: wl_protocols_dir / 'unstable/relative-pointer/relative-pointer-unstable-v1.xml',
+    output: 'relative-pointer-unstable-v1.h',
+    command: [
+      'wayland-scanner',
+      'client-header',
+      '@INPUT@',
+      '@OUTPUT@'
+    ]
+  )
+  relative_c = custom_target(
+    'relative-pointer-unstable-v1-c',
+    input: wl_protocols_dir / 'unstable/relative-pointer/relative-pointer-unstable-v1.xml',
+    output: 'relative-pointer-unstable-v1.c',
+    command: [
+      'wayland-scanner',
+      'public-code',
+      '@INPUT@',
+      '@OUTPUT@'
+    ]
+  )
+  system_ss.add([constraints_h, constraints_c, relative_h, relative_c])
+endif
 system_ss.add(ui)
 system_ss.add(when: pixman, if_true: files('console-vc.c'), if_false: files('console-vc-stubs.c'))
 if dbus_display
