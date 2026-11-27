@@ -3,13 +3,10 @@
 
 // NOTE: For research purposes "Command list by ascii order" can be searched for a list of all available commands
 
-// TODO: Good news is: https://www.yout-ube.com/watch?v=inhZC75_mdU has a reference for the Windows XP test page,
-
 // Is this entire file over-engineered? Probably.
 // Do i care? No, not really.
 
-const char* esc_to_string(char c);
-const char* esc_to_string(char c)
+static const char* esc_to_string(char c)
 {
     // NOTE: Got these names from https://www.ascii-code.com/characters/control-characters?view=grid
     switch (c)
@@ -87,8 +84,7 @@ const char* esc_to_string(char c)
     }
 }
 
-void reset_cmd_sequence(EscpState* esc);
-void reset_cmd_sequence(EscpState* esc)
+static void reset_cmd_sequence(EscpState* esc)
 {
     esc->sequence_size = 0;
     if(esc->current_sequence != NULL)
@@ -118,8 +114,7 @@ void escp_reset(EscpState* esc)
     reset_cmd_sequence(esc);
 }
 
-void escp_sequence_add(EscpState* esc, uint8_t data);
-void escp_sequence_add(EscpState* esc, uint8_t data)
+static void escp_sequence_add(EscpState* esc, uint8_t data)
 {
     if(esc->current_sequence == NULL)
     {
@@ -137,8 +132,7 @@ void escp_sequence_add(EscpState* esc, uint8_t data)
 
 
 // NOTE: The implementation details are based on https://github.com/RealDeuce/epsonfx80/blob/master/docs/fx80_emulator_notes.md
-void escp_print_character(EscpState* esc, uint8_t data);
-void escp_print_character(EscpState* esc, uint8_t data)
+static void escp_print_character(EscpState* esc, uint8_t data)
 {
     uint8_t* glyph = &esc->printable_glyphs[(data + (esc->italic ? 128 : 0)) * 12];
 
@@ -307,8 +301,6 @@ void escp_init_n(EscpState* esc, const EscCommand* commands, size_t n, escvarian
 // (BYTE 0), 0 = 12 CPI
 // (BYTE 0), 1 = 10 CPI
 // (BYTE 0), 2 = 15 CPI
-// TODO: Still haven't figured out a clean way to calculate how many pixels this would require
-// TODO: Apparently the calculation for inches per character is 1/{SELECTED CPI}
 void esc_cmd_select_cpi(EscpState* esc, EscData params)
 {
     if(params.caller_params == NULL)

@@ -1,17 +1,29 @@
 #include "hw/printer/paper.h"
 
-void paper_init(PaperState* paper, uint64_t width, uint64_t height)
+static void paper_dealloc(PaperState* paper)
 {
-    paper->width = width;
-    paper->height = height;
-    paper->current_x = 0;
-    paper->current_y = 0;
-
     if(paper->buffer != NULL)
     {
         free(paper->buffer);
         paper->buffer = NULL;
     }
+}
+
+void paper_init(PaperState* paper, uint64_t width, uint64_t height)
+{
+    if(!paper->modified)
+    {
+        return;
+    }
+
+    paper->modified = false;
+
+    paper->width = width;
+    paper->height = height;
+    paper->current_x = 0;
+    paper->current_y = 0;
+
+    paper_dealloc(paper);
 
     uint64_t stride = paper->width * 3;
     stride += (4-(stride)%4)%4;
@@ -24,17 +36,23 @@ void paper_init(PaperState* paper, uint64_t width, uint64_t height)
 
 void paper_advance(PaperState* paper, int64_t x, int64_t y)
 {
+    paper->modified = true;
+
     paper->current_x += x;
     paper->current_y += y;
 }
 
 void paper_reset_horizontal(PaperState* paper)
 {
+    paper->modified = true;
+
     paper->current_x = 0;
 }
 
 void paper_set_pixel(PaperState* paper, int64_t relative_x, int64_t relative_y, uint8_t r, uint8_t g, uint8_t b)
 {
+    paper->modified = true;
+
     int64_t x = (paper->current_x + relative_x);
     int64_t y = (paper->height - (paper->current_y + relative_y)) - 1;
 
@@ -59,6 +77,8 @@ void paper_set_pixel(PaperState* paper, int64_t relative_x, int64_t relative_y, 
 
 void paper_set_block(PaperState* paper, int64_t relative_x, int64_t relative_y, int64_t width, int64_t height, uint8_t r, uint8_t g, uint8_t b)
 {
+    paper->modified = true;
+
     for(int y = 0; y < height; y++)
     {
         for(int x = 0; x < width; x++)
@@ -72,6 +92,8 @@ void paper_set_block(PaperState* paper, int64_t relative_x, int64_t relative_y, 
 
 void paper_finish(PaperState* paper, const char* filename)
 {
+    paper->modified = true;
+
     FILE *fp = fopen(filename, "wb");
 
     int filesize = HEADER_SIZE + paper->buffer_size;
@@ -121,6 +143,5 @@ void paper_finish(PaperState* paper, const char* filename)
 
     fclose(fp);
 
-    free(paper->buffer);
-    paper->buffer = NULL;
+    paper_dealloc(paper);
 }

@@ -11,6 +11,7 @@ struct PaperState
     uint64_t height;
     uint64_t buffer_size;
     uint8_t* buffer;
+    bool modified;
 };
 
 typedef struct PaperState PaperState;
